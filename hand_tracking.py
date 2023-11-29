@@ -25,9 +25,11 @@ class Tracker():
                 self.mpDraw.draw_landmarks(img, hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS)
         return img
     
-    def tracking(self, img, hand='right'):
+    def tracking(self, img):
         tracking_points = []
         dist = 10e5 
+        x1 = -1
+        y1 = -1
         if self.results.multi_hand_landmarks:
             hand_landmarks = self.results.multi_hand_landmarks[0]
             for id, lm in enumerate(hand_landmarks.landmark):
@@ -42,10 +44,10 @@ class Tracker():
             y_c = (y1+y2)//2
             cv2.line(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
             cv2.circle(img, (x_c, y_c), 10, (255, 0, 255), cv2.FILLED)  
-            dist = ((x1-x_c)**2 + (y1-y_c)**2)**0.5    
+            dist = ((x1-x2)**2 + (y1-y2)**2)**0.5    
             cv2.putText(img, f'distance: {dist}', (40, 40),cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 255), 2)         
         
-        return img, dist
+        return img, dist, x1, y1
     
     
     
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     while True:
         success, img = cap.read()
         img = tracker.hand_landmark(img)
-        img, _ = tracker.tracking(img)
+        img, dist, x_1, y_1 = tracker.tracking(img)
         cv2.imshow('Image', img)
         cv2.waitKey(1)
                     
